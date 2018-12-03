@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>React Soccer Stats</title>
+	<!-- Bootstrap CDN -->
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="css/styles.css">
+</head>
+<body class="outer-container">
+	<div id="root"></div>
+	<script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+	<script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+	<script src="https://unpkg.com/babel-standalone@6.26.0/babel.js"></script>
+	<script src="https://unpkg.com/axios@0.16.2/dist/axios.min.js"></script>
+	<script src="js/config.json"></script>
+	<script type="text/babel">
+		class SoccerSchedule extends React.Component {
+			state = {
+				loaded: false,
+				schedule: [],
+				today: new Date
+			}
+			componentDidMount() {
+				axios({
+					url: 'https://api.football-data.org/v2/matches?status=SCHEDULED',
+					method: 'get',
+					headers: {
+						'X-Auth-Token': config.apiKey
+					}
+				}).then(response => {
+					this.setState({
+						loaded: true,
+						schedule: response.data.matches
+					})
+				}).catch(function(error) {
+        			console.log(error);
+      			})
+			}
+			formatClassName = (competition) => {
+				return competition.replace(/\s+/g, '-').toLowerCase()
+			}
+			getStartTime = (isoDate) => {
+				return isoDate.slice(0, -1).split('T')[1]
+			}
+			render() {
+				return (
+					<div className="container">
+						<h1 className="main-heading mt-4 mb-4 text-center">Scheduled games today: {this.state.today.toDateString()}</h1>
+						{this.state.schedule.length == 0 && 
+							<p className="text-center">Sorry, there are no available matches right now - please try again soon!</p>
+						}
+
+						{this.state.schedule.map((match, index) => (
+							<div key={match.id} className={"match pt-4 " + this.formatClassName(match.competition.name)}>
+							{/* TODO: Adjust so that only one heading per league is displayed when multiple games available from same league */}
+								<h2 className="match-league">{match.competition.name}</h2>
+							{/* TODO: Adjust this so that user local time is displayed */}
+								<p className="match-details">{match.homeTeam.name} vs {match.awayTeam.name} at {this.getStartTime(match.utcDate)}</p>
+							</div>
+						))}
+						<p className="text-center mt-5">Football data provided by the <a href="https://www.football-data.org/" target="_blank">Football-Data.org API</a></p>
+					</div>
+				) 
+			}
+		}
+
+		ReactDOM.render(<SoccerSchedule />, document.getElementById('root'));
+	</script>
+</body>
+</html>
