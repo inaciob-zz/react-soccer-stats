@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>React Soccer Stats</title>
+	<title>React Soccer Schedule</title>
 	<!-- Bootstrap CDN -->
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 	<link rel="stylesheet" type="text/css" href="css/styles.css">
@@ -19,12 +19,17 @@
 		class SoccerSchedule extends React.Component {
 			state = {
 				loaded: false,
+				defaultStatus: 'SCHEDULED',
 				schedule: [],
 				today: new Date
 			}
+			// Default status for displayed matches is SCHEDULED
 			componentDidMount() {
+				this.getMatches(this.state.defaultStatus);
+			}
+			getMatches = (status) => {
 				axios({
-					url: 'https://api.football-data.org/v2/matches?status=SCHEDULED',
+					url: 'https://api.football-data.org/v2/matches?status=' + status,
 					method: 'get',
 					headers: {
 						'X-Auth-Token': config.apiKey
@@ -34,32 +39,62 @@
 						loaded: true,
 						schedule: response.data.matches
 					})
+					console.log(this.state.schedule)
 				}).catch(function(error) {
         			console.log(error);
       			})
 			}
+			handleClick = (event) => {
+				event.preventDefault();
+				const status = event.target.id.toUpperCase();
+				this.getMatches(status);
+			}
 			formatClassName = (competition) => {
-				return competition.replace(/\s+/g, '-').toLowerCase()
+				return competition.replace(/\s+/g, '-').toLowerCase();
 			}
 			getStartTime = (isoDate) => {
-				return isoDate.slice(0, -1).split('T')[1]
+				return isoDate.slice(0, -1).split('T')[1];
 			}
 			render() {
+				// Sort matches by league name first, then by start time
+				const sortedMatches = this.state.schedule
+										.sort((a, b) => a.competition.name > b.competition.name)
+										.map((match, index) => (
+											<div key={match.id} className={"match mt-4 p-4 " + this.formatClassName(match.competition.name)}>
+												<h2 className="match-league">{match.competition.name}</h2>
+											{/* TODO: Adjust this so that user local time is displayed */}
+												{match.status == this.state.defaultStatus && 
+													<p className="match-details">{match.homeTeam.name} vs {match.awayTeam.name} at {this.getStartTime(match.utcDate)}</p>
+												}
+
+												{match.status == 'IN_PLAY' && 
+													<p className="match-details">{match.homeTeam.name} vs {match.awayTeam.name}</p>
+												}
+
+												{match.status == 'FINISHED' && 
+													<p className="match-details">{match.homeTeam.name} vs {match.awayTeam.name}</p>
+												}
+											</div>
+										))
+
 				return (
 					<div className="container">
-						<h1 className="main-heading mt-4 mb-4 text-center">Scheduled games today: {this.state.today.toDateString()}</h1>
+						<h1 className="main-heading mt-4 mb-5 text-center">Scheduled games today: {this.state.today.toDateString()}</h1>
+						
+						<div className="btn-group btn-group-lg d-flex justify-content-center mb-5" role="group" aria-label="Match filters">
+							<button type="button" id="scheduled" onClick={this.handleClick} className="btn btn-secondary">Scheduled</button>
+						  	<button type="button" id="live" onClick={this.handleClick} className="btn btn-secondary">Live</button>
+						  	<button type="button" id="finished" onClick={this.handleClick} className="btn btn-secondary">Finished</button>
+						</div>
+						
 						{this.state.schedule.length == 0 && 
 							<p className="text-center">Sorry, there are no available matches right now - please try again soon!</p>
 						}
 
-						{this.state.schedule.map((match, index) => (
-							<div key={match.id} className={"match pt-4 " + this.formatClassName(match.competition.name)}>
-							{/* TODO: Adjust so that only one heading per league is displayed when multiple games available from same league */}
-								<h2 className="match-league">{match.competition.name}</h2>
-							{/* TODO: Adjust this so that user local time is displayed */}
-								<p className="match-details">{match.homeTeam.name} vs {match.awayTeam.name} at {this.getStartTime(match.utcDate)}</p>
-							</div>
-						))}
+						{sortedMatches}
+
+						{/* TODO: Add retrieval of live/finished match data when that status is requested */}
+
 						<p className="text-center mt-5">Football data provided by the <a href="https://www.football-data.org/" target="_blank">Football-Data.org API</a></p>
 					</div>
 				) 
