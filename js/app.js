@@ -86,7 +86,7 @@ class SoccerSchedule extends React.Component {
 				</div>
 				
 				{this.state.schedule.length == 0 && 
-					<p className="text-center">Sorry, there are no available matches right now - please try again soon!</p>
+					<p className="text-center">Sorry, there are no available {this.state.activeState.toLowerCase()} matches right now - please try again soon!</p>
 				}
 
 				{sortedMatches}
