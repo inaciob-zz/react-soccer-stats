@@ -2,6 +2,7 @@ class SoccerSchedule extends React.Component {
 	state = {
 		loaded: false,
 		defaultStatus: 'SCHEDULED',
+		activeState: 'SCHEDULED',
 		schedule: [],
 		today: new Date
 	}
@@ -31,6 +32,9 @@ class SoccerSchedule extends React.Component {
 		event.preventDefault();
 		const status = event.target.id.toUpperCase();
 		this.getMatches(status);
+		this.setState({
+			activeState: status
+		})
 	}
 	formatClassName = (competition) => {
 		return competition.replace(/\s+/g, '-').toLowerCase();
@@ -67,9 +71,18 @@ class SoccerSchedule extends React.Component {
 				<h1 className="main-heading mt-4 mb-5 text-center">Games today: {this.state.today.toDateString()}</h1>
 				
 				<div className="btn-group-filters btn-group btn-group-lg d-flex justify-content-center mb-5" role="group" aria-label="Match filters">
-					<button type="button" id="scheduled" onClick={this.handleClick} className="match-filter-btn btn btn-outline-success">Scheduled</button>
-				  	<button type="button" id="live" onClick={this.handleClick} className="match-filter-btn btn btn-outline-success">Live</button>
-				  	<button type="button" id="finished" onClick={this.handleClick} className="match-filter-btn btn btn-outline-success">Finished</button>
+					<button type="button" id="scheduled" onClick={this.handleClick} 
+							className={"match-filter-btn btn btn-outline-success " + (this.state.activeState == this.state.defaultStatus ? 'active' : '')}>
+								Scheduled
+					</button>
+				  	<button type="button" id="live" onClick={this.handleClick} 
+				  			className={"match-filter-btn btn btn-outline-success " + (this.state.activeState == 'LIVE' ? 'active' : '')}>
+				  				Live
+				  	</button>
+				  	<button type="button" id="finished" onClick={this.handleClick} 
+				  			className={"match-filter-btn btn btn-outline-success " + (this.state.activeState == 'FINISHED' ? 'active' : '')}>
+				  				Finished
+				  	</button>
 				</div>
 				
 				{this.state.schedule.length == 0 && 
