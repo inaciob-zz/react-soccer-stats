@@ -2,7 +2,10 @@
 	background-color: #fff;
 }
 
-.match-filter-btn:focus {
+.match-filter-btn:focus,
+.match-filter-btn.active:focus,
+/* NOTE: This specific selector exists to override default Bootstrap behaviour */
+.btn-outline-success.match-filter-btn:not(:disabled):not(.disabled).active:focus {
 	box-shadow: none;
 	outline: none;
 }
