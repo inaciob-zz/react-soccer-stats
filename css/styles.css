@@ -1,11 +1,15 @@
-.outer-container {
-	background: #2E3133;
-	color: #fff;
+.match-filter-btn {
+	background-color: #fff;
+}
+
+.match-filter-btn:focus {
+	box-shadow: none;
+	outline: none;
 }
 
 .match {
 	background-color: #fff;
-	border: 1px solid #fff;
+	border: 1px solid #BFFFBF;
 	border-radius: 5px;
 	color: #2E3133;
 	cursor: pointer;
@@ -13,6 +17,5 @@
 }
 
 .match:hover {
-	background-color: #B8C4CC;
 	background-color: #BFFFBF;
 }
