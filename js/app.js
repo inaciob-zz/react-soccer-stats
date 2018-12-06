@@ -17,13 +17,15 @@ class SoccerSchedule extends React.Component {
 				'X-Auth-Token': config.apiKey
 			}
 		}).then(response => {
-			this.setState({
-				loaded: true,
-				schedule: response.data.matches
-			})
+			if(response.status == 200) {
+				this.setState({
+					loaded: true,
+					schedule: response.data.matches
+				})
+			}
 		}).catch(function(error) {
 			console.log(error);
-			})
+		})
 	}
 	handleClick = (event) => {
 		event.preventDefault();
@@ -78,8 +80,8 @@ class SoccerSchedule extends React.Component {
 
 				{/* TODO: Add retrieval of live/finished match data when that status is requested */}
 
-				<p className="text-center mt-5">Football data provided by the 
-					<a href="https://www.football-data.org/" className="text-success" target="_blank">Football-Data.org API</a>
+				<p className="text-center mt-5">Football data provided by the <a href="https://www.football-data.org/" className="text-success" target="_blank">
+				Football-Data.org API</a>
 				</p>
 			</div>
 		) 
