@@ -15,10 +15,23 @@
 	border: 1px solid #BFFFBF;
 	border-radius: 5px;
 	color: #2E3133;
-	cursor: pointer;
 	transition: background-color .25s ease;
 }
 
 .match:hover {
 	background-color: #BFFFBF;
+}
+
+.hoverable-icon,
+.hoverable-icon:hover {
+	cursor: pointer;
+}
+
+.hoverable-icon-desc:hover {
+	text-decoration: underline;
+}
+
+.club-crest {
+	height: 40px;
+	width: 40px;
 }
