@@ -1,3 +1,9 @@
+/* Start utilities */
+.hidden {
+	display: none;
+}
+/* End utilities */
+
 .match-filter-btn {
 	background-color: #fff;
 }
