@@ -67,6 +67,9 @@ class SoccerSchedule extends React.Component {
 		})
 	}
 	render() {
+		// Formatting for current date heading
+		const options = { weekday: 'short', month: 'short', day: 'numeric' };
+
 		// Sort matches by league name first, then by start time
 		const sortedMatches = this.state.schedule
 								.sort((a, b) => a.competition.name > b.competition.name)
@@ -118,7 +121,7 @@ class SoccerSchedule extends React.Component {
 
 		return (
 			<div className="container">
-				<h1 className="main-heading mt-4 mb-5 text-center">Games today: {this.state.today.toDateString()}</h1>
+				<h1 className="main-heading mt-4 mb-5 text-center">Games today: {this.state.today.toLocaleDateString(navigator.language, options)}</h1>
 				
 				<div className="btn-group-filters btn-group btn-group-lg d-flex justify-content-center mb-5" role="group" aria-label="Match filters">
 					<button type="button" id="scheduled" onClick={this.handleClick} 
