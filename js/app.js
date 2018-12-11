@@ -4,6 +4,7 @@ class SoccerSchedule extends React.Component {
 		defaultStatus: 'SCHEDULED',
 		activeState: 'SCHEDULED',
 		schedule: [],
+		competitionCode: '',
 		standings: [],
 		standingsVisible: false,
 		today: new Date
@@ -35,7 +36,8 @@ class SoccerSchedule extends React.Component {
 		const status = event.target.id.toUpperCase();
 		this.getMatches(status);
 		this.setState({
-			activeState: status
+			activeState: status,
+			standingsVisible: false
 		})
 	}
 	formatClassName = (competition) => {
@@ -46,10 +48,54 @@ class SoccerSchedule extends React.Component {
 		const preFormattedStartTime = isoDate.slice(0, -1).split('T')[1];
 		return preFormattedStartTime.substring(0, preFormattedStartTime.lastIndexOf(':'))
 	}
-	getStandings = () => {
+	getLeagueCode = (event) => {
+		event.preventDefault();
+		const currentLeague = event.currentTarget.attributes['data-league'].value;
+
+		switch(currentLeague) {
+			case 'UEFA Champions League':
+				return 'CL';
+				break;
+			case 'Primeira Liga':
+				return 'PPL';
+				break;
+			case 'Premier League':
+				return 'PL';
+				break;
+			case 'Eredivisie':
+				return 'DED';
+				break;
+			case '1. Bundesliga':
+				return 'BL1';
+				break;
+			case 'Ligue 1':
+				return 'FL1';
+				break;
+			case 'Serie A':
+				return 'SA';
+				break;
+			case 'Primera Division':
+				return 'PD';
+				break;
+			case 'Championship':
+				return 'ELC';
+				break;
+			case 'World Cup':
+				return 'WC';
+				break;
+			case 'European Cup of Nations':
+				return 'EC';
+				break;
+			default:
+				return 'error';
+				break;
+		}
+	}
+	getStandings = (event) => {
+		let league = this.getLeagueCode(event);
 		// TODO: Retrieve standings for the competition a user has requested to see the table for (remove hard-coding of PL as competition code)
 		axios({
-			url: 'https://api.football-data.org/v2/competitions/PL/standings?standingType=TOTAL',
+			url: 'https://api.football-data.org/v2/competitions/' + league + '/standings?standingType=TOTAL',
 			method: 'get',
 			headers: {
 				'X-Auth-Token': config.apiKey
@@ -58,7 +104,8 @@ class SoccerSchedule extends React.Component {
 			if(response.status == 200) {
 				this.setState({
 					loaded: true,
-					standings: response.data.standings[0].table,
+					competitionCode: response.data.competition.code,
+					standings: (response.data.competition.code == 'CL') ? response.data.standings : response.data.standings[0].table,
 					standingsVisible: true
 				})
 			}
@@ -92,7 +139,7 @@ class SoccerSchedule extends React.Component {
 										</div>
 										<div className="col-sm-4">
 											<div className="row">
-												<div className="hoverable-icon" onClick={this.getStandings}>
+												<div className="hoverable-icon" data-league={match.competition.name} onClick={this.getStandings}>
 													<span className="hoverable-icon-desc">View Table</span>
 													<div className="clearfix"></div>
 													<i className="fas fa-table"></i>
@@ -102,22 +149,101 @@ class SoccerSchedule extends React.Component {
 									</div>
 								))
 
-		const leagueTable = this.state.standings
-								.map((club, index) => (
-									<tr key={club.position}>
-								    	<th scope="row">{club.position}</th>
-								    	<td>
-								    		<img src={club.team.crestUrl} className="club-crest mr-4" />
-								    		{club.team.name}
-								    	</td>
-								    	<td>{club.playedGames}</td>
-								    	<td>{club.won}</td>
-								    	<td>{club.draw}</td>
-								    	<td>{club.lost}</td>
-								    	<td>{club.points}</td>
-								    </tr>
-								))
-
+		// NOTE: The intention behind naming this fragment 'commonLeagueTable' is to reflect its usage for domestic, non-tournament competitions
+		const leagueTable = (this.state.competitionCode == 'CL' || this.state.competitionCode == 'WC' || this.state.competitionCode == 'EC') ? 
+									this.state.standings
+										.map((group, index) => {
+											return (
+												<tr key={group.group}>
+													<th scope="row">
+														{group.group.replace('_', ' ')}
+														{
+															group.table.map((team, innerIndex) => {
+																return (
+																	<p key={team.position} className="mt-4">{team.position}</p>
+																)
+															})
+														}
+													</th>
+													{/* TODO: Make this more DRY by using something like Object.keys to render in a loop */}
+													<td className="pt-5">
+														{
+															group.table.map((team, innerIndex) => {
+																return (
+																	<React.Fragment key={team.team.id}>
+																		<p>
+																			<img src={team.team.crestUrl} className="club-crest mr-4" />
+															    			{team.team.name}
+															    		</p>
+															    	</React.Fragment>
+																)
+															})
+														}
+													</td>
+													<td className="pt-5">
+														{
+															group.table.map((team, innerIndex) => {
+																return (
+																	<p key={team.team.id} className="mt-4">{team.playedGames}</p>
+																)
+															})
+														}
+													</td>
+													<td className="pt-5">
+														{
+															group.table.map((team, innerIndex) => {
+																return (
+																	<p key={team.team.id} className="mt-4">{team.won}</p>
+																)
+															})
+														}
+													</td>
+													<td className="pt-5">
+														{
+															group.table.map((team, innerIndex) => {
+																return (
+																	<p key={team.team.id} className="mt-4">{team.draw}</p>
+																)
+															})
+														}
+													</td>
+													<td className="pt-5">
+														{
+															group.table.map((team, innerIndex) => {
+																return (
+																	<p key={team.team.id} className="mt-4">{team.lost}</p>
+																)
+															})
+														}
+													</td>
+													<td className="pt-5">
+														{
+															group.table.map((team, innerIndex) => {
+																return (
+																	<p key={team.team.id} className="mt-4">{team.points}</p>
+																)
+															})
+														}
+													</td>
+												</tr>
+											)
+										}) : 
+									this.state.standings
+										.map((club, index) => (
+											<tr key={club.position}>
+										    	<th scope="row">{club.position}</th>
+										    	<td>
+										    		<img src={club.team.crestUrl} className="club-crest mr-4" />
+										    		{club.team.name}
+										    	</td>
+										    	<td>{club.playedGames}</td>
+										    	<td>{club.won}</td>
+										    	<td>{club.draw}</td>
+										    	<td>{club.lost}</td>
+										    	<td>{club.points}</td>
+										    </tr>
+										))
+									
 
 		return (
 			<div className="container">
@@ -145,8 +271,8 @@ class SoccerSchedule extends React.Component {
 				{sortedMatches}
 
 				{this.state.standings.length > 0 && 
-					<div className="row mt-4">
-						<table className={"table table-bordered bg-white " + (this.state.standingsVisible ? 'visible' : 'invisible')}>
+					<div className={"row mt-4 " + (this.state.standingsVisible ? 'visible' : 'hidden')}>
+						<table className="table table-bordered bg-white">
 							<thead className="thead-dark">
 								<tr>
 							      	<th scope="col">Position</th>
