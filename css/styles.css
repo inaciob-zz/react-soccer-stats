@@ -4,6 +4,12 @@
 }
 /* End utilities */
 
+/* This is to handle cases of clubs for which a logo asset is not provided via the API data */
+img:not([src]), 
+img[src=""] {
+	background: #ccc;
+}
+
 .match-filter-btn {
 	background-color: #fff;
 }
@@ -29,7 +35,8 @@
 }
 
 .hoverable-icon,
-.hoverable-icon:hover {
+.hoverable-icon:hover,
+.site-link {
 	cursor: pointer;
 }
 
