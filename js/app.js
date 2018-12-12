@@ -150,9 +150,9 @@ class SoccerSchedule extends React.Component {
 											</div>
 											
 											{match.referees.length > 0 && 
-												<div className="row mt-2">
+												<div className="row mt-3 pt-2">
 													<i className="fas fa-user"></i>
-													<span className="pl-3">{match.referees[0]}</span>
+													<span className="pl-3">{match.referees[0].name}</span>
 												</div>
 											}
 										</div>
