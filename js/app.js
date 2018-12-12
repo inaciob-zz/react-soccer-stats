@@ -4,9 +4,10 @@ class SoccerSchedule extends React.Component {
 		defaultStatus: 'SCHEDULED',
 		activeState: 'SCHEDULED',
 		schedule: [],
+		shouldShowSchedule: true,
 		competitionCode: '',
 		standings: [],
-		standingsVisible: false,
+		shouldShowStandings: false,
 		today: new Date
 	}
 	// Default status for displayed matches is SCHEDULED
@@ -24,7 +25,8 @@ class SoccerSchedule extends React.Component {
 			if(response.status == 200) {
 				this.setState({
 					loaded: true,
-					schedule: response.data.matches
+					schedule: response.data.matches,
+					shouldShowSchedule: true
 				})
 			}
 		}).catch(function(error) {
@@ -36,8 +38,9 @@ class SoccerSchedule extends React.Component {
 		const status = event.target.id.toUpperCase();
 		this.getMatches(status);
 		this.setState({
-			activeState: status,
-			standingsVisible: false
+			activeState: status || this.state.defaultStatus,
+			shouldShowSchedule: true,
+			shouldShowStandings: false
 		})
 	}
 	formatClassName = (competition) => {
@@ -105,8 +108,9 @@ class SoccerSchedule extends React.Component {
 				this.setState({
 					loaded: true,
 					competitionCode: response.data.competition.code,
+					shouldShowSchedule: false,
 					standings: (response.data.competition.code == 'CL') ? response.data.standings : response.data.standings[0].table,
-					standingsVisible: true
+					shouldShowStandings: true
 				})
 			}
 		}).catch(function(error) {
@@ -121,35 +125,40 @@ class SoccerSchedule extends React.Component {
 		const sortedMatches = this.state.schedule
 								.sort((a, b) => a.competition.name > b.competition.name)
 								.map((match, index) => (
-									<div key={match.id} className="row match mt-4 p-4">
+									<div key={match.id} className={"row match mt-4 p-4 " + (this.state.shouldShowSchedule ? 'visible' : 'hidden')}>
 										<div className={"col-sm-8 " + this.formatClassName(match.competition.name)}>
 											<h2 className="match-league">{match.competition.name}</h2>
 										{/* TODO: Adjust this so that user local time is displayed */}
 											{match.status == this.state.defaultStatus && 
-												<p className="match-details">{match.homeTeam.name} vs {match.awayTeam.name} at {this.getStartTime(match.utcDate)}</p>
+												<p className="match-details mt-4">{match.homeTeam.name} vs {match.awayTeam.name} at {this.getStartTime(match.utcDate)}</p>
 											}
 
 											{(match.status == 'IN_PLAY' || match.status == 'PAUSED') && 
-												<p className="match-details">{match.homeTeam.name} vs {match.awayTeam.name}</p>
+												<p className="match-details mt-4">{match.homeTeam.name} vs {match.awayTeam.name}</p>
 											}
 
 											{match.status == 'FINISHED' && 
-												<p className="match-details">{match.homeTeam.name} vs {match.awayTeam.name}</p>
+												<p className="match-details mt-4">{match.homeTeam.name} vs {match.awayTeam.name}</p>
 											}
 										</div>
 										<div className="col-sm-4">
-											<div className="row">
+											<div className="row mt-2 pt-1">
 												<div className="hoverable-icon" data-league={match.competition.name} onClick={this.getStandings}>
-													<span className="hoverable-icon-desc">View Table</span>
-													<div className="clearfix"></div>
 													<i className="fas fa-table"></i>
+													<span className="hoverable-icon-desc pl-3">View Table</span>
 												</div>
 											</div>
+											
+											{match.referees.length > 0 && 
+												<div className="row mt-2">
+													<i className="fas fa-user"></i>
+													<span className="pl-3">{match.referees[0]}</span>
+												</div>
+											}
 										</div>
 									</div>
 								))
 
-		// NOTE: The intention behind naming this fragment 'commonLeagueTable' is to reflect its usage for domestic, non-tournament competitions
 		const leagueTable = (this.state.competitionCode == 'CL' || this.state.competitionCode == 'WC' || this.state.competitionCode == 'EC') ? 
 									this.state.standings
 										.map((group, index) => {
@@ -263,6 +272,10 @@ class SoccerSchedule extends React.Component {
 				  				Finished
 				  	</button>
 				</div>
+
+				{this.state.shouldShowStandings && 
+					<a className="site-link text-success" onClick={this.handleClick}>Return to schedule</a>
+				}
 				
 				{this.state.schedule.length == 0 && 
 					<p className="text-center">Sorry, there are no available {this.state.activeState.toLowerCase()} matches right now - please try again soon!</p>
@@ -271,7 +284,7 @@ class SoccerSchedule extends React.Component {
 				{sortedMatches}
 
 				{this.state.standings.length > 0 && 
-					<div className={"row mt-4 " + (this.state.standingsVisible ? 'visible' : 'hidden')}>
+					<div className={"row mt-4 " + (this.state.shouldShowStandings ? 'visible' : 'hidden')}>
 						<table className="table table-bordered bg-white">
 							<thead className="thead-dark">
 								<tr>
