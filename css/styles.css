@@ -4,12 +4,6 @@
 }
 /* End utilities */
 
-/* This is to handle cases of clubs for which a logo asset is not provided via the API data */
-img:not([src]), 
-img[src=""] {
-	background: #ccc;
-}
-
 .match-filter-btn {
 	background-color: #fff;
 }
@@ -42,9 +36,4 @@ img[src=""] {
 
 .hoverable-icon-desc:hover {
 	text-decoration: underline;
-}
-
-.club-crest {
-	height: 40px;
-	width: 40px;
 }
