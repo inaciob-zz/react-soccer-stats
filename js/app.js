@@ -68,7 +68,7 @@ class SoccerSchedule extends React.Component {
 			case 'Eredivisie':
 				return 'DED';
 				break;
-			case '1. Bundesliga':
+			case 'Bundesliga':
 				return 'BL1';
 				break;
 			case 'Ligue 1':
@@ -96,7 +96,7 @@ class SoccerSchedule extends React.Component {
 	}
 	getStandings = (event) => {
 		let league = this.getLeagueCode(event);
-		// TODO: Retrieve standings for the competition a user has requested to see the table for (remove hard-coding of PL as competition code)
+		
 		axios({
 			url: 'https://api.football-data.org/v2/competitions/' + league + '/standings?standingType=TOTAL',
 			method: 'get',
@@ -180,10 +180,7 @@ class SoccerSchedule extends React.Component {
 															group.table.map((team, innerIndex) => {
 																return (
 																	<React.Fragment key={team.team.id}>
-																		<p>
-																			<img src={team.team.crestUrl} className="club-crest mr-4" />
-															    			{team.team.name}
-															    		</p>
+																		<p>{team.team.name}</p>
 															    	</React.Fragment>
 																)
 															})
@@ -241,10 +238,7 @@ class SoccerSchedule extends React.Component {
 										.map((club, index) => (
 											<tr key={club.position}>
 										    	<th scope="row">{club.position}</th>
-										    	<td>
-										    		<img src={club.team.crestUrl} className="club-crest mr-4" />
-										    		{club.team.name}
-										    	</td>
+										    	<td>{club.team.name}</td>
 										    	<td>{club.playedGames}</td>
 										    	<td>{club.won}</td>
 										    	<td>{club.draw}</td>
@@ -285,7 +279,7 @@ class SoccerSchedule extends React.Component {
 
 				{this.state.standings.length > 0 && 
 					<div className={"row mt-4 " + (this.state.shouldShowStandings ? 'visible' : 'hidden')}>
-						<table className="table table-bordered bg-white">
+						<table className="table table-bordered table-striped">
 							<thead className="thead-dark">
 								<tr>
 							      	<th scope="col">Position</th>
