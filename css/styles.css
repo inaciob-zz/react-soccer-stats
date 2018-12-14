@@ -2,6 +2,10 @@
 .hidden {
 	display: none;
 }
+
+.fs-16 {
+	font-size: 1rem;
+}
 /* End utilities */
 
 .match-filter-btn {

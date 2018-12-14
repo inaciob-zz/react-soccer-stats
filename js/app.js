@@ -38,7 +38,7 @@ class SoccerSchedule extends React.Component {
 		const status = event.target.id.toUpperCase();
 		this.getMatches(status);
 		this.setState({
-			activeState: status || this.state.defaultStatus,
+			activeState: status,
 			shouldShowSchedule: true,
 			shouldShowStandings: false
 		})
@@ -128,17 +128,32 @@ class SoccerSchedule extends React.Component {
 									<div key={match.id} className={"row match mt-4 p-4 " + (this.state.shouldShowSchedule ? 'visible' : 'hidden')}>
 										<div className={"col-sm-8 " + this.formatClassName(match.competition.name)}>
 											<h2 className="match-league">{match.competition.name}</h2>
-										{/* TODO: Adjust this so that user local time is displayed */}
+											{/* TODO: Adjust this so that user local time is displayed */}
 											{match.status == this.state.defaultStatus && 
 												<p className="match-details mt-4">{match.homeTeam.name} vs {match.awayTeam.name} at {this.getStartTime(match.utcDate)}</p>
 											}
 
-											{(match.status == 'IN_PLAY' || match.status == 'PAUSED') && 
-												<p className="match-details mt-4">{match.homeTeam.name} vs {match.awayTeam.name}</p>
-											}
-
-											{match.status == 'FINISHED' && 
-												<p className="match-details mt-4">{match.homeTeam.name} vs {match.awayTeam.name}</p>
+											{(match.status == 'IN_PLAY' || match.status == 'PAUSED' || match.status == 'FINISHED') && 
+												// NOTE: The conditions here are due to when scores data becomes available
+												// The ternary logic here is that if the current match status is 'IN_PLAY' or 'FINISHED', then 
+												// display the fullTime score which is provided as the source of truth per the API docs until 
+												// an official halftime score is provided
+												<p className="match-details mt-4">
+													<React.Fragment>
+														{match.homeTeam.name}
+														<span className="fs-16 badge badge-success m-1 ml-3 p-2">{
+															(match.status == 'IN_PLAY' || match.status == 'FINISHED') ? 
+																match.score.fullTime.homeTeam : match.score.halfTime.homeTeam
+														}
+														</span>
+														<span className="fs-16 badge badge-success m-1 mr-3 p-2">{
+															(match.status == 'IN_PLAY' || match.status == 'FINISHED') ? 
+																match.score.fullTime.awayTeam : match.score.halfTime.awayTeam
+														}
+														</span>
+														{match.awayTeam.name}
+													</React.Fragment>
+												</p>
 											}
 										</div>
 										<div className="col-sm-4">
@@ -150,8 +165,8 @@ class SoccerSchedule extends React.Component {
 											</div>
 											
 											{match.referees.length > 0 && 
-												<div className="row mt-3 pt-2">
-													<i className="fas fa-user"></i>
+												<div className="row mt-3 pt-3">
+													<i className="fas fa-user pt-1"></i>
 													<span className="pl-3">{match.referees[0].name}</span>
 												</div>
 											}
@@ -297,8 +312,6 @@ class SoccerSchedule extends React.Component {
 						</table>
 					</div>
 				}
-
-				{/* TODO: Add retrieval of live/finished match data when that status is requested */}
 
 				<p className="text-center mt-5">Football data provided by the <a href="https://www.football-data.org/" className="text-success" target="_blank">
 				Football-Data.org API</a>
