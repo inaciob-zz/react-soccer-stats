@@ -1,8 +1,4 @@
 /* Start utilities */
-.hidden {
-	display: none;
-}
-
 .fs-16 {
 	font-size: 1rem;
 }
@@ -30,14 +26,4 @@
 
 .match:hover {
 	background-color: #BFFFBF;
-}
-
-.hoverable-icon,
-.hoverable-icon:hover,
-.site-link {
-	cursor: pointer;
-}
-
-.hoverable-icon-desc:hover {
-	text-decoration: underline;
 }
