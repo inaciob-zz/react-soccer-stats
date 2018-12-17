@@ -24,7 +24,6 @@ class SoccerSchedule extends React.Component {
 					schedule: response.data.matches
 				})
 			}
-			console.log(this.state.schedule)
 		}).catch(function(error) {
 			console.log(error);
 		})
@@ -59,7 +58,7 @@ class SoccerSchedule extends React.Component {
 									<div key={match.id} className="row match mt-4 p-4">
 										<div className={"col-sm-8 " + this.formatClassName(match.competition.name)}>
 											<h2 className="match-league">{match.competition.name}</h2>
-											
+
 											{match.status == this.state.defaultStatus && 
 												<p className="match-details mt-4">{match.homeTeam.name} vs {match.awayTeam.name} at {this.getStartTime(match.utcDate)}</p>
 											}
@@ -89,7 +88,7 @@ class SoccerSchedule extends React.Component {
 										</div>
 										<div className="col-sm-4">
 											{match.referees.length > 0 && 
-												<div className="row mt-3 pt-3">
+												<div className="row mt-2 pt-1">
 													<i className="fas fa-user pt-1"></i>
 													<span className="pl-3">{match.referees[0].name}</span>
 												</div>
