@@ -24,6 +24,7 @@ class SoccerSchedule extends React.Component {
 					schedule: response.data.matches
 				})
 			}
+			console.log(this.state.schedule)
 		}).catch(function(error) {
 			console.log(error);
 		})
@@ -39,10 +40,13 @@ class SoccerSchedule extends React.Component {
 	formatClassName = (competition) => {
 		return competition.replace(/\s+/g, '-').toLowerCase();
 	}
-	getStartTime = (isoDate) => {
-		// Purpose of this function is to extract only the start time for a match (Ex. 20:00) from match.utcDate (default format is YYYY-MM-DDTHH:MM:SSZ)
-		const preFormattedStartTime = isoDate.slice(0, -1).split('T')[1];
-		return preFormattedStartTime.substring(0, preFormattedStartTime.lastIndexOf(':'))
+	getStartTime = (utcDate) => {
+		// Purpose of this function is to extract the start time for a match (Ex. 20:00) from match.utcDate (default format is YYYY-MM-DDTHH:MM:SSZ), then
+		// format that time to match the users' locale using Moment.js & the Internationalization API
+		// Approach for retrieving user time zone taken from https://www.quora.com/How-do-you-get-the-extract-users-timezone-using-JavaScript as well as 
+		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DateTimeFormat/resolvedOptions
+		const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+		return moment(utcDate).tz(userTimezone).format('h:mmA z');
 	}
 	render() {
 		// Formatting for current date heading
@@ -55,7 +59,7 @@ class SoccerSchedule extends React.Component {
 									<div key={match.id} className="row match mt-4 p-4">
 										<div className={"col-sm-8 " + this.formatClassName(match.competition.name)}>
 											<h2 className="match-league">{match.competition.name}</h2>
-											{/* TODO: Adjust this so that user local time is displayed */}
+											
 											{match.status == this.state.defaultStatus && 
 												<p className="match-details mt-4">{match.homeTeam.name} vs {match.awayTeam.name} at {this.getStartTime(match.utcDate)}</p>
 											}
