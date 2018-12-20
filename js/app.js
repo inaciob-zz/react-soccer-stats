@@ -71,12 +71,14 @@ class SoccerSchedule extends React.Component {
 												<p className="match-details mt-4">
 													<React.Fragment>
 														{match.homeTeam.name}
-														<span className="fs-16 badge badge-success m-1 ml-3 p-2">{
+														<span className={"fs-16 badge " + 
+																		(match.status == 'FINISHED' ? 'badge-dark' : 'badge-success') + " m-1 ml-3 p-2"}>{
 															(match.status == 'IN_PLAY' || match.status == 'FINISHED') ? 
 																match.score.fullTime.homeTeam : match.score.halfTime.homeTeam
 														}
 														</span>
-														<span className="fs-16 badge badge-success m-1 mr-3 p-2">{
+														<span className={"fs-16 badge " + 
+																		(match.status == 'FINISHED' ? 'badge-dark' : 'badge-success') + " m-1 mr-3 p-2"}>{
 															(match.status == 'IN_PLAY' || match.status == 'FINISHED') ? 
 																match.score.fullTime.awayTeam : match.score.halfTime.awayTeam
 														}
