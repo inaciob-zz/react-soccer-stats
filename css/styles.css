@@ -27,3 +27,35 @@
 .match:hover {
 	background-color: #BFFFBF;
 }
+
+/* Start media queries */
+@media screen and (max-width: 993px) {
+	.container {
+		 max-width: 90vw; 
+	}
+}
+
+@media screen and (min-width: 200px) and (max-width: 414px) {
+	.text-block {
+		display: block;
+	}
+
+	.live-score {
+		max-width: 50%;
+	}
+
+	.referee-name {
+		padding-left: 30px;
+	}
+}
+
+@media screen and (min-width: 414px) and (max-width: 992px) {
+	.text-block {
+		display: block;
+	}
+
+	.live-score {
+		max-width: 50%;
+	}
+}
+/* End media queries */
