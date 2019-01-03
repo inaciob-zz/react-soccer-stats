@@ -56,11 +56,13 @@ class SoccerSchedule extends React.Component {
 								.sort((a, b) => a.competition.name > b.competition.name)
 								.map((match, index) => (
 									<div key={match.id} className="row match mt-4 p-4">
-										<div className={"col-sm-8 " + this.formatClassName(match.competition.name)}>
+										<div className={"col-sm-7 " + this.formatClassName(match.competition.name)}>
 											<h2 className="match-league">{match.competition.name}</h2>
 
 											{match.status == this.state.defaultStatus && 
-												<p className="match-details mt-4">{match.homeTeam.name} vs {match.awayTeam.name} at {this.getStartTime(match.utcDate)}</p>
+												<p className="match-details mt-4">
+													{match.homeTeam.name} vs {match.awayTeam.name} <span className="text-block">at {this.getStartTime(match.utcDate)}</span>
+												</p>
 											}
 
 											{(match.status == 'IN_PLAY' || match.status == 'PAUSED' || match.status == 'FINISHED') && 
@@ -70,25 +72,26 @@ class SoccerSchedule extends React.Component {
 												// an official halftime score is provided
 												<p className="match-details mt-4">
 													<React.Fragment>
-														{match.homeTeam.name}
-														<span className={"fs-16 badge " + 
-																		(match.status == 'FINISHED' ? 'badge-dark' : 'badge-success') + " m-1 ml-3 p-2"}>{
+														<span className={"live-score fs-16 text-block badge " + 
+																		(match.status == 'FINISHED' ? 'badge-dark' : 'badge-success') + " m-1 p-2"}>{
 															(match.status == 'IN_PLAY' || match.status == 'FINISHED') ? 
 																match.score.fullTime.homeTeam : match.score.halfTime.homeTeam
 														}
 														</span>
-														<span className={"fs-16 badge " + 
+														<span className={"live-score fs-16 text-block badge " + 
 																		(match.status == 'FINISHED' ? 'badge-dark' : 'badge-success') + " m-1 mr-3 p-2"}>{
 															(match.status == 'IN_PLAY' || match.status == 'FINISHED') ? 
 																match.score.fullTime.awayTeam : match.score.halfTime.awayTeam
 														}
 														</span>
-														{match.awayTeam.name}
+														<span className="text-block">{match.homeTeam.name}</span>
+														<span className="text-block"> vs </span>
+														<span className="text-block">{match.awayTeam.name}</span>
 													</React.Fragment>
 												</p>
 											}
 										</div>
-										<div className="col-sm-4">
+										<div className="referee-name col-sm-5">
 											{match.referees.length > 0 && 
 												<div className="row mt-2 pt-1">
 													<i className="fas fa-user pt-1"></i>
@@ -102,7 +105,9 @@ class SoccerSchedule extends React.Component {
 
 		return (
 			<div className="container">
-				<h1 className="main-heading mt-4 mb-5 text-center">Games today: {this.state.today.toLocaleDateString(navigator.language, options)}</h1>
+				<h1 className="main-heading mt-4 mb-5 text-center">Games today: 
+					<span className="text-block">{this.state.today.toLocaleDateString(navigator.language, options)}</span>
+				</h1>
 				
 				<div className="btn-group-filters btn-group btn-group-lg d-flex justify-content-center mb-5" role="group" aria-label="Match filters">
 					<button type="button" id="scheduled" onClick={this.handleClick} 
